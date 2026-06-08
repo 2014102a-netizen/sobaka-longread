@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Собака, которая догоняла интернет</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,500&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=PT+Sans:wght@400;700&display=swap&subset=cyrillic,cyrillic-ext" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f4efe4;
+    --paper-2:#efe8d8;
+    --ink:#1b1815;
+    --ink-soft:#4a443c;
+    --red:#cc2417;
+    --red-deep:#9c1a10;
+    --line:#cdc3ad;
+    --grot:'PT Sans',sans-serif;
+    --serif:'PT Serif',Georgia,serif;
+    --disp:'Playfair Display',Georgia,serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--serif);
+    font-size:19px;
+    line-height:1.72;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(circle at 12% 8%, rgba(204,36,23,.04), transparent 40%),
+      radial-gradient(circle at 88% 92%, rgba(27,24,21,.05), transparent 45%);
+  }
+  /* subtle paper grain */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:0 26px}
+
+  /* ---- HERO ---- */
+  header.hero{padding:88px 0 54px;border-bottom:3px double var(--line)}
+  .kicker{
+    font-family:var(--grot);font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+    font-size:12px;color:var(--red);margin-bottom:26px;
+    opacity:0;transform:translateY(14px);animation:rise .8s .1s forwards;
+  }
+  h1{
+    font-family:var(--disp);font-weight:800;line-height:1.04;letter-spacing:-.01em;
+    font-size:clamp(40px,8vw,68px);margin-bottom:24px;
+    opacity:0;transform:translateY(18px);animation:rise .9s .25s forwards;
+  }
+  h1 em{font-style:italic;color:var(--red);font-weight:600}
+  .standfirst{
+    font-family:var(--serif);font-style:italic;font-size:clamp(19px,2.6vw,23px);
+    line-height:1.55;color:var(--ink-soft);max-width:600px;
+    opacity:0;transform:translateY(18px);animation:rise .9s .42s forwards;
+  }
+  .byline{
+    font-family:var(--grot);font-size:13px;letter-spacing:.04em;color:var(--ink-soft);
+    margin-top:34px;display:flex;flex-wrap:wrap;gap:6px 18px;
+    opacity:0;animation:fade 1s .7s forwards;
+  }
+  .byline b{color:var(--ink);font-weight:700}
+  @keyframes rise{to{opacity:1;transform:none}}
+  @keyframes fade{to{opacity:1}}
+
+  /* ---- BODY ---- */
+  article{padding:48px 0 20px}
+  article p{margin:0 0 26px}
+  .lead::first-letter{
+    font-family:var(--disp);font-weight:800;float:left;font-size:78px;line-height:.72;
+    padding:10px 14px 0 0;color:var(--red);
+  }
+
+  .era{
+    margin:64px 0 8px;display:flex;align-items:baseline;gap:16px;
+  }
+  .era .num{
+    font-family:var(--disp);font-size:54px;font-weight:800;color:var(--line);line-height:1;
+  }
+  .era .meta{flex:1}
+  .era .years{font-family:var(--grot);font-weight:700;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--red)}
+  .era h2{font-family:var(--disp);font-weight:600;font-size:clamp(26px,4vw,34px);line-height:1.1;margin-top:4px}
+  .era + p{margin-top:22px}
+
+  .pull{
+    font-family:var(--disp);font-style:italic;font-weight:500;
+    font-size:clamp(24px,4vw,32px);line-height:1.3;color:var(--red-deep);
+    margin:46px 0;padding-left:24px;border-left:4px solid var(--red);
+  }
+
+  /* ---- FIGURE SLOTS ---- */
+  figure{margin:40px 0;}
+  .slot{
+    border:1.5px dashed var(--line);background:
+      repeating-linear-gradient(45deg,transparent,transparent 11px,rgba(204,36,23,.05) 11px,rgba(204,36,23,.05) 22px);
+    aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;text-align:center;
+    border-radius:2px;transition:border-color .3s,background .3s;
+  }
+  .slot:hover{border-color:var(--red)}
+  .slot span{
+    font-family:var(--grot);font-size:13px;color:var(--ink-soft);max-width:80%;letter-spacing:.02em;
+  }
+  .slot span b{display:block;color:var(--red);font-size:11px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:7px}
+  figure.duo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  figure.duo .slot{aspect-ratio:4/5}
+  figure.trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  figure img{width:100%;display:block;border:1px solid var(--line);border-radius:2px}
+  figcaption{
+    font-family:var(--grot);font-size:13px;color:var(--ink-soft);margin-top:11px;line-height:1.45;
+    padding-left:2px;border-left:0;
+  }
+  figcaption b{color:var(--ink)}
+
+  /* ---- DIVIDER ---- */
+  .rule{border:none;border-top:1px solid var(--line);margin:56px auto;width:60%}
+  .dingbat{text-align:center;color:var(--red);font-size:22px;margin:50px 0;letter-spacing:.5em}
+
+  /* ---- FOOTER SECTIONS ---- */
+  .endmatter{border-top:3px double var(--line);margin-top:64px;padding:46px 0 90px;font-size:15px;line-height:1.6}
+  .endmatter h3{font-family:var(--grot);font-weight:700;letter-spacing:.16em;text-transform:uppercase;font-size:12px;color:var(--red);margin:34px 0 16px}
+  .endmatter ol,.endmatter ul{margin:0 0 10px 20px}
+  .endmatter li{margin-bottom:9px;font-family:var(--serif)}
+  .endmatter .prompt{
+    font-family:var(--grot);font-size:13.5px;background:var(--paper-2);border-left:3px solid var(--line);
+    padding:12px 16px;margin:0 0 12px;color:var(--ink-soft);border-radius:0 3px 3px 0;
+  }
+  .note{font-family:var(--grot);font-size:12.5px;color:var(--ink-soft);font-style:normal;margin-top:18px}
+  a{color:var(--red-deep);text-decoration:underline;text-underline-offset:2px}
+
+  @media(max-width:560px){
+    body{font-size:18px}
+    .lead::first-letter{font-size:62px}
+    figure.duo{grid-template-columns:1fr}
+    figure.trio{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Лонгрид · цифровая среда · визуальное исследование</div>
+    <h1>Собака, которая <em>догоняла</em> интернет</h1>
+    <p class="standfirst">Четыре редизайна sobaka.ru — и история о том, что веб-версия журнала никогда не была журналом. Она бежала совсем за другим.</p>
+    <div class="byline">
+      <span><b>Андрей Минеев</b></span>
+      <span>ИТМО · Digital Humanities</span>
+      <span>курс «Текст. Код. Дизайн»</span>
+      <span>2026</span>
+    </div>
+  </div>
+</header>
+
+<article>
+<div class="wrap">
+
+<p class="lead">Открываю sobaka.ru с телефона в мае 2026-го и узнаю половину лиц на главной. Это журнал моего города, журнал среды, в которой протекает моя жизнь и прошло моё взросление. А потом я открываю Wayback Machine, набираю тот же адрес и выбираю 2000 год — и на экране три нарисованные собаки на флеш-заставке. Не СМИ, не лента, не каталог. Просто объект. И в этот момент становится ясно: то, что я открыл с телефона, и то, что было в 2000-м, — это не одно и то же существо, повзрослевшее за двадцать шесть лет. Это разные виды.</p>
+
+<p>Соблазн рассказать про sobaka.ru как про «оцифрованный глянец» — сайт, который рос рядом с бумажным журналом и постепенно научился быть его электронной копией. Так удобно думать. Но это неправда. Большую часть своей жизни сайт даже не делала редакция журнала: до середины 2010-х это были разные команды. Сайт никогда не копировал бумагу. Он догонял интернет — и конкретно тех, кто в интернете задавал правила: медиа, рождённые в цифре, без всякого печатного прошлого. Четыре редизайна sobaka.ru — это четыре раза, когда сайт спохватывался и бежал за уже изменившейся средой.</p>
+
+<p class="pull">Сайт не взрослел вместе с журналом. Он догонял чужой интернет — и каждый раз с опозданием.</p>
+
+<!-- ERA 1 -->
+<div class="era">
+  <div class="num">01</div>
+  <div class="meta">
+    <div class="years">2000 – 2007</div>
+    <h2>Утка</h2>
+  </div>
+</div>
+
+<p>Первый сайт — это чистая «утка» в смысле Вентури: форма здесь и есть содержание, объект сам себя означает, он ничего не упаковывает. Три собаки, Flash, агрессивный красный, жёсткая табличная вёрстка. Делала это веб-студия Molinos — отдельные люди, отдельная логика. Это не медиа, это цифровой арт-объект, который случайно носит имя журнала.</p>
+
+<p>Когда к середине двухтысячных сайт всё-таки превращается в витрину, он делает единственное, что умеет: пытается изобразить глянец средствами HTML. Рубрики набраны курсивным рукописным шрифтом — наивная попытка имитировать журнальную типографику там, где её технически нет. Появляется колонка «Персоны»: светская жизнь, втиснутая в таблицу. Это важная деталь — сайт не воспроизводит макет журнала, он имитирует саму идею «глянцевости», не имея для неё инструментов.</p>
+
+<figure class="duo">
+  <img src="screenshots/01-sobaka-2000.png" alt="sobaka.ru 2000">
+  <img src="screenshots/02-afisha-2006.png" alt="afisha.ru 2006">
+  <figcaption style="grid-column:1/-1"><b>Утка против сервиса.</b> Слева — sobaka.ru, 2000: форма неотделима от содержания, сайт сам и есть высказывание. Справа — afisha.ru, 2006: уже портал с каталогом и фильтрами. Источник: web.archive.org. Скриншоты автора.</figcaption>
+</figure>
+
+<p>Для сравнения — что делала Афиша в те же годы. Пока «Собака» оставалась флеш-игрушкой, afisha.ru уже выстроила сложную табличную навигацию, рубрикатор и каталог. Афиша с самого начала была сервисом: расписание, события, фильтры. Журналистский контент там был — и сильный, — но форму задавал не он, а сервисная логика. Это важная оговорка, к которой я ещё вернусь.</p>
+
+<!-- ERA 2 -->
+<div class="era">
+  <div class="num">02</div>
+  <div class="meta">
+    <div class="years">2011</div>
+    <h2>Украшенный сарай</h2>
+  </div>
+</div>
+
+<p>2011 год — первый настоящий перелом. Рукописный курсив исчезает. Логотип набирается строгим гротеском. Появляются кнопки соцсетей — ВКонтакте, Facebook, чистый дух времени. Двухколоночная сетка, слайдеры, карточки новостей. Сайт становится порталом.</p>
+
+<p>Вопрос: с кого он это срисовал? Не с бумажного журнала. С Look at Me — digital-native издания без всякого печатного прототипа, которое именно в эти годы задало для Рунета новый стандарт: отказ от мелкого журнального текста в пользу модульной карточной сетки, крупных фото и гротеска. «Собака» переняла визуальную модель, заданную теми, у кого журнала не было вообще. С этого момента сайт — «украшенный сарай» по Вентури: устойчивая CMS-оболочка, внутри которой меняется содержимое, а структура остаётся почти неизменной. Декорация сменная, сарай тот же.</p>
+
+<figure class="duo">
+  <img src="screenshots/03-sobaka-2011.png" alt="sobaka.ru 2011">
+  <img src="screenshots/04-lookatme-2011.png" alt="Look at Me 2011">
+  <figcaption style="grid-column:1/-1"><b>Заимствование, а не наследование.</b> Слева — «Собака», 2011, справа — Look at Me, у которого она училась карточной сетке и гротеску. Печатный журнал в этом диалоге не участвует. Источник: web.archive.org. Скриншоты автора.</figcaption>
+</figure>
+
+<!-- ERA 3 -->
+<div class="era">
+  <div class="num">03</div>
+  <div class="meta">
+    <div class="years">2016</div>
+    <h2>Максимальный орнамент</h2>
+  </div>
+</div>
+
+<p>К 2016-му сарай обрастает декором до предела. Возвращается собака-маскот. Раздувается меню. Появляется баннерная реклама. В навигации уверенно закрепляется Telegram как полноценная платформа. Чуть позже добавится коронавирусный информационный шум — закреплённые рубрики, плашки, баннеры поверх баннеров. Это пик визуальной избыточности.</p>
+
+<p>Здесь работает Земпер: орнамент привязан к технике изготовления. Двухуровневое горизонтальное меню, которое тянется через все редизайны с 2011 по 2026 год, — это и есть цифровой орнамент, форма которого продиктована возможностями и ограничениями HTML и CSS. Он мигрирует из версии в версию, как узор, потому что так устроена технология, а не потому, что так решил арт-директор.</p>
+
+<p>И снова — кто рядом. В петербургской нише к этому времени появляется «Бумага» (paperpaper.ru), digital-native конкурент, пришедший к похожей сетке вообще без печатного наследия. Два городских медиа из одного Петербурга идут к близкой форме разными путями. А The Village в это же время демонстративно остаётся минималистичным: новостная лента, теги, никакого разрастания. Контраст стратегий налицо — «Собака» наращивает орнамент, конкуренты режут его. И снова бумажный журнал тут ни при чём.</p>
+
+<figure class="duo">
+  <img src="screenshots/05-sobaka-2016.png" alt="sobaka.ru 2016">
+  <img src="screenshots/06-village-2016.png" alt="The Village 2016">
+  <figcaption style="grid-column:1/-1"><b>Кризис перепроизводства против минимализма.</b> Слева — «Собака», 2016: раздутое меню, маскот, баннеры. Справа — The Village: та же эпоха, обратная стратегия. Источник: web.archive.org. Скриншоты автора.</figcaption>
+</figure>
+
+<!-- ERA 4 -->
+<div class="era">
+  <div class="num">04</div>
+  <div class="meta">
+    <div class="years">2022 – 2026</div>
+    <h2>Среда вместо сайта</h2>
+  </div>
+</div>
+
+<p>Последний редизайн внешне выглядит как возвращение к глянцу: чистый лонгрид, максимально упрощённый логотип, гигантские авторские иллюстрации, минимум визуального мусора. Но это обманчивое сходство. Сайт перестал быть центром вселенной. Рядом с ним на равных живут Telegram (около 38 тысяч подписчиков) и ВКонтакте (под 140 тысяч), а бумажные номера продаются через Ozon по 700 рублей.</p>
+
+<p>Один и тот же материал теперь существует в трёх визуальных языках сразу. Met Gala 2026: на сайте — слайдер, в Telegram — коллаж из фотографий, во ВКонтакте — карточки-товары с номерами журнала. Там, где в бумажном глянце была бы фотография, на сайте теперь стоит видеоролик — формат, заимствованный из логики Reels и клипов, а не из печатной традиции. Визуально это похоже на журнал, но устроено по законам соцсетей.</p>
+
+<figure class="trio">
+  <img src="screenshots/07-sobaka-site-2026.png" alt="sobaka.ru сайт 2026">
+  <img src="screenshots/08-sobaka-telegram-2026.png" alt="Собака Telegram 2026">
+  <img src="screenshots/09-sobaka-vk-2026.png" alt="Собака VK 2026">
+  <figcaption style="grid-column:1/-1"><b>Одно событие — три формы.</b> Сайт, Telegram и ВКонтакте, 2026: каждая платформа диктует свой визуальный язык одному и тому же материалу. Скриншоты автора.</figcaption>
+</figure>
+
+<p class="pull">«Собака» не умерла как сайт. Она перестала быть сайтом — и стала средой.</p>
+
+<hr class="rule">
+
+<!-- COUNTER-ARGUMENT -->
+<p>На защите исследования прозвучал честный и неудобный вопрос: если «Собака» начиналась как журнал, почему я называю её «сайтом», а не «цифровым журналом» — так же, как мы спокойно называем журналом Афишу? Вопрос правильный, и он заставляет договорить мысль до конца.</p>
+
+<p>Дело не в происхождении и не в качестве журналистики. Наследие печати у «Собаки» есть, но это эхо, а не структура — призрак, который ничего не определяет в форме. У The Village призрака нет вовсе: рождённый в цифре, он с первого дня строил себя как новостную ленту. Афиша же, при всём сильном журналистском контенте, формой всегда была сервисом — каталог, расписание, фильтры; журналистика ехала сверху на структуре, которая сама по себе не журналистская. Значит, «журнал» против «сайта» — это вопрос не о том, откуда ты пришёл и что пишешь, а о том, что задаёт твою форму. И у «Собаки», и у Афиши форму задавала цифровая среда и конкуренция, а не бумага. Поэтому из этой истории и стоит убрать постоянную оглядку на печатный журнал: она мешает увидеть настоящего собеседника сайта — другой сайт.</p>
+
+<div class="dingbat">• • •</div>
+
+<!-- CONCLUSION -->
+<p>Что вообще значит быть «глянцем» в 2026 году? У «Собаки» три платформы с тремя визуальными языками и бумажный номер на маркетплейсе. «Глянцевость» как единая визуальная категория растворилась. Осталась не форма, а интонация, которая каждый раз заново отливается под платформу.</p>
+
+<p>Я начинал это исследование как разбор вёрстки, а закончил чем-то вроде археологии собственной памяти. Листая архивы, я наткнулся на то, как The Village прямо со страниц звал читать его «с VPN». На светскую хронику, где Брэд Питт с Анджелиной Джоли покупают путёвки в Сочи. На рубрики, которых больше нет, и темы, которые сегодня кажутся невозможными. Шрифт менялся, люди менялись, эпоха менялась — а сайт всё это фиксировал. Я несколько дней пересылал эти скриншоты друзьям, и каждый отвечал одинаково: «слушай, а помнишь».</p>
+
+<p>Поэтому настоящий герой этого текста — не веб-сайт. Настоящий сюжет в том, что, чтобы вспомнить, как мы жили, я теперь открываю не фотоальбом, а Wayback Machine. Целая жизнь — в скриншотах сломанной вёрстки. И «Собака», которая двадцать шесть лет догоняла интернет, в итоге сделала ровно то, чего никогда не умел бумажный глянец: она стала машиной времени.</p>
+
+</div>
+</article>
+
+<!-- END MATTER -->
+<div class="endmatter">
+<div class="wrap">
+
+  <h3>Основание · что за этим стоит</h3>
+  <p style="font-size:15px;line-height:1.6">Лонгрид опирается на индивидуальное визуальное исследование «Эволюция визуального языка российских глянцевых медиа в цифровой среде: sobaka.ru, afisha.ru, the-village.ru (2000–2026)». Материал — более 50 скриншотов, собранных через Wayback Machine и живые версии сайтов и соцсетей; анализ выстроен по понятиям курса (орнамент, форма, труд, программа, инструмент) с опорой на дихотомию «утка / украшенный сарай» Р. Вентури и трактовку орнамента у Г. Земпера.</p>
+
+  <h3>Источники</h3>
+  <ol>
+    <li>sobaka.ru — архивные версии 2000–2024 через <a href="https://web.archive.org">Wayback Machine</a> и живой сайт (май 2026). Скриншоты автора.</li>
+    <li>afisha.ru / daily.afisha.ru — архивные версии 2006–2023. Скриншоты автора.</li>
+    <li>the-village.ru — архивные версии 2012–2022. Скриншоты автора.</li>
+    <li>Look at Me, «Бумага» (paperpaper.ru) — архивные версии для сравнения. Скриншоты автора.</li>
+    <li>Telegram-канал и VK-страница «Собака.ru» (май 2026). Скриншоты автора.</li>
+    <li>Р. Вентури, Д. Скотт-Браун, С. Айзенур. «Уроки Лас-Вегаса» — дихотомия «утка / украшенный сарай».</li>
+    <li>Г. Земпер — концепция орнамента, привязанного к технике изготовления.</li>
+  </ol>
+  <p class="note">Лицензии: все изображения — скриншоты автора. Использование в учебных целях допускается по ст. 1274 ГК РФ с указанием источника.</p>
+
+  <h3>Использование ИИ · промпты</h3>
+  <p style="font-size:15px;line-height:1.6;margin-bottom:16px">При подготовке лонгрида использовался ИИ-ассистент (Claude, Anthropic) для структурирования аргумента и редактуры. Итоговые формулировки и выводы — авторские. Основные промпты:</p>
+  <div class="prompt">«На основе моего визуального исследования sobaka.ru (гипотеза: визуальный язык определялся цифровой средой и digital-native конкурентами, а не печатной версией) предложи структуру лонгрида в роли критика под критерии задания: оригинальность 50%, точность 30%, креативность 20%».</div>
+  <div class="prompt">«Учти обратную связь с питчинга: убрать постоянные отсылки к печатному журналу, рассматривать сайт как сайт; не утверждать, что Афиша „никогда не была журналом“; усилить линию конкуренции (Look at Me, Бумага); сохранить личный, ностальгический голос».</div>
+  <div class="prompt">«Собери четыре редизайна (2000–2007, 2011, 2016, 2022–2026) в драматургию из четырёх актов через дихотомию „утка / украшенный сарай“ и орнамент Земпера; финал — что значит быть „глянцем“ в 2026».</div>
+  <div class="prompt">«Свёрстай лонгрид как одностраничный сайт в редакционной эстетике, размести слоты под мои скриншоты с подписями».</div>
+
+  <p class="note" style="margin-top:30px">Аудитория: редакторы и продюсеры онлайн-медиа, медиаменеджеры, студенты журналистики и медиакоммуникаций — те, кому полезно понимать, что форму цифрового издания задаёт не его прошлое, а среда и конкуренция.</p>
+
+</div>
+</div>
+
+</body>
+</html>
