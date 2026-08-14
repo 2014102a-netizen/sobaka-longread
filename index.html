@@ -108,7 +108,8 @@
   figure.duo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   figure.duo .slot{aspect-ratio:4/5}
   figure.trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-  figure img{width:100%;display:block;border:1px solid var(--line);border-radius:2px;object-fit:cover;aspect-ratio:4/3}
+  figure img{width:100%;display:block;border:1px solid var(--line);border-radius:2px;object-fit:cover;aspect-ratio:4/3;cursor:zoom-in;transition:border-color .2s,transform .2s}
+  figure img:hover,figure img:focus-visible{border-color:var(--red)}
   figcaption{
     font-family:var(--grot);font-size:13px;color:var(--ink-soft);margin-top:11px;line-height:1.45;
     padding-left:2px;border-left:0;
@@ -130,6 +131,32 @@
   }
   .note{font-family:var(--grot);font-size:12.5px;color:var(--ink-soft);font-style:normal;margin-top:18px}
   a{color:var(--red-deep);text-decoration:underline;text-underline-offset:2px}
+
+  /* ---- IMAGE VIEWER ---- */
+  .image-viewer{position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:68px 16px 24px;background:rgba(27,24,21,.94);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s,visibility .22s}
+  .image-viewer.is-open{opacity:1;visibility:visible;pointer-events:auto}
+  .viewer-stage{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:min(78dvh,820px);overflow:hidden}
+  .viewer-image{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;user-select:none;-webkit-user-drag:none;touch-action:none;cursor:grab;transform:translate3d(0,0,0) scale(1);transform-origin:center;will-change:transform}
+  .viewer-image.is-dragging{cursor:grabbing}
+  .viewer-close,.viewer-nav,.viewer-zoom button{border:1px solid rgba(244,239,228,.35);background:rgba(27,24,21,.72);color:var(--paper);font:700 20px/1 var(--grot);cursor:pointer;display:grid;place-items:center;transition:background .2s,border-color .2s}
+  .viewer-close:hover,.viewer-nav:hover,.viewer-zoom button:hover,.viewer-close:focus-visible,.viewer-nav:focus-visible,.viewer-zoom button:focus-visible{background:var(--red);border-color:var(--red)}
+  .viewer-close{position:absolute;top:16px;right:16px;width:42px;height:42px;border-radius:50%;font-size:27px;font-weight:400}
+  .viewer-nav{position:absolute;top:50%;width:42px;height:58px;border-radius:2px;font-size:30px;transform:translateY(-50%)}
+  .viewer-prev{left:16px}.viewer-next{right:16px}
+  .viewer-toolbar{position:absolute;left:16px;right:16px;bottom:16px;display:flex;align-items:center;justify-content:center;gap:14px;pointer-events:none}
+  .viewer-zoom{display:flex;gap:6px;pointer-events:auto}
+  .viewer-zoom button{width:38px;height:34px;font-size:18px}
+  .viewer-counter{font:12px/1 var(--grot);letter-spacing:.12em;color:rgba(244,239,228,.72);pointer-events:none}
+  .viewer-caption{max-width:min(720px,calc(100% - 92px));margin-top:14px;color:rgba(244,239,228,.82);font:13px/1.4 var(--grot);text-align:center}
+  body.viewer-is-open{overflow:hidden}
+  @media(max-width:560px){
+    .image-viewer{padding:62px 8px 18px}
+    .viewer-stage{height:min(74dvh,680px)}
+    .viewer-nav{width:36px;height:48px;font-size:25px}
+    .viewer-prev{left:4px}.viewer-next{right:4px}
+    .viewer-close{top:10px;right:10px}
+    .viewer-caption{max-width:calc(100% - 64px);font-size:12px}
+  }
 
   @media(max-width:560px){
     body{font-size:18px}
@@ -299,6 +326,131 @@
 
 </div>
 </div>
+
+<div class="image-viewer" id="imageViewer" role="dialog" aria-modal="true" aria-label="Просмотр изображения" aria-hidden="true">
+  <button class="viewer-close" type="button" aria-label="Закрыть просмотр">×</button>
+  <button class="viewer-nav viewer-prev" type="button" aria-label="Предыдущее изображение">‹</button>
+  <div class="viewer-stage">
+    <img class="viewer-image" alt="">
+  </div>
+  <div class="viewer-caption"></div>
+  <div class="viewer-toolbar">
+    <div class="viewer-zoom" aria-label="Масштаб">
+      <button type="button" data-zoom="out" aria-label="Уменьшить">−</button>
+      <button type="button" data-zoom="reset" aria-label="Сбросить масштаб">1:1</button>
+      <button type="button" data-zoom="in" aria-label="Увеличить">+</button>
+    </div>
+    <div class="viewer-counter" aria-live="polite"></div>
+  </div>
+  <button class="viewer-nav viewer-next" type="button" aria-label="Следующее изображение">›</button>
+</div>
+
+<script>
+  (() => {
+    const images = [...document.querySelectorAll('figure img')];
+    const viewer = document.getElementById('imageViewer');
+    const viewerImage = viewer.querySelector('.viewer-image');
+    const caption = viewer.querySelector('.viewer-caption');
+    const counter = viewer.querySelector('.viewer-counter');
+    const stage = viewer.querySelector('.viewer-stage');
+    let current = 0;
+    let scale = 1;
+    let offsetX = 0;
+    let offsetY = 0;
+    let pointers = new Map();
+    let pinchDistance = 0;
+    let dragStart = null;
+    let lastFocused = null;
+
+    images.forEach((image, index) => {
+      image.tabIndex = 0;
+      image.setAttribute('role', 'button');
+      image.setAttribute('aria-label', `Открыть изображение: ${image.alt}`);
+      image.addEventListener('click', () => openViewer(index));
+      image.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openViewer(index); }
+      });
+    });
+
+    function renderTransform() { viewerImage.style.transform = `translate3d(${offsetX}px, ${offsetY}px, 0) scale(${scale})`; }
+    function resetZoom() { scale = 1; offsetX = 0; offsetY = 0; renderTransform(); }
+    function setZoom(nextScale) {
+      scale = Math.min(5, Math.max(1, nextScale));
+      if (scale === 1) { offsetX = 0; offsetY = 0; }
+      renderTransform();
+    }
+    function openViewer(index) {
+      current = (index + images.length) % images.length;
+      lastFocused = document.activeElement;
+      viewerImage.src = images[current].src;
+      viewerImage.alt = images[current].alt;
+      caption.textContent = images[current].alt;
+      counter.textContent = `${current + 1} / ${images.length}`;
+      resetZoom();
+      viewer.classList.add('is-open');
+      viewer.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('viewer-is-open');
+      viewer.querySelector('.viewer-close').focus();
+    }
+    function closeViewer() {
+      viewer.classList.remove('is-open');
+      viewer.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('viewer-is-open');
+      viewerImage.src = '';
+      if (lastFocused) lastFocused.focus();
+    }
+    function changeImage(step) { openViewer(current + step); }
+
+    viewer.querySelector('.viewer-close').addEventListener('click', closeViewer);
+    viewer.querySelector('.viewer-prev').addEventListener('click', () => changeImage(-1));
+    viewer.querySelector('.viewer-next').addEventListener('click', () => changeImage(1));
+    viewer.querySelectorAll('[data-zoom]').forEach(button => button.addEventListener('click', () => {
+      const action = button.dataset.zoom;
+      if (action === 'reset') resetZoom();
+      if (action === 'in') setZoom(scale + .5);
+      if (action === 'out') setZoom(scale - .5);
+    }));
+    viewer.addEventListener('click', event => { if (event.target === viewer || event.target === stage) closeViewer(); });
+    document.addEventListener('keydown', event => {
+      if (!viewer.classList.contains('is-open')) return;
+      if (event.key === 'Escape') closeViewer();
+      if (event.key === 'ArrowLeft') changeImage(-1);
+      if (event.key === 'ArrowRight') changeImage(1);
+      if (event.key === '+' || event.key === '=') setZoom(scale + .5);
+      if (event.key === '-') setZoom(scale - .5);
+      if (event.key === '0') resetZoom();
+    });
+    viewerImage.addEventListener('wheel', event => { event.preventDefault(); setZoom(scale + (event.deltaY < 0 ? .35 : -.35)); }, {passive:false});
+    viewerImage.addEventListener('pointerdown', event => {
+      viewerImage.setPointerCapture(event.pointerId);
+      pointers.set(event.pointerId, {x:event.clientX, y:event.clientY});
+      if (pointers.size === 1 && scale > 1) {
+        dragStart = {x:event.clientX, y:event.clientY, offsetX, offsetY};
+        viewerImage.classList.add('is-dragging');
+      }
+      if (pointers.size === 2) pinchDistance = distance([...pointers.values()]);
+    });
+    viewerImage.addEventListener('pointermove', event => {
+      if (!pointers.has(event.pointerId)) return;
+      pointers.set(event.pointerId, {x:event.clientX, y:event.clientY});
+      if (pointers.size === 2) {
+        const nextDistance = distance([...pointers.values()]);
+        if (pinchDistance) setZoom(scale * (nextDistance / pinchDistance));
+        pinchDistance = nextDistance;
+      } else if (dragStart && scale > 1) {
+        offsetX = dragStart.offsetX + event.clientX - dragStart.x;
+        offsetY = dragStart.offsetY + event.clientY - dragStart.y;
+        renderTransform();
+      }
+    });
+    ['pointerup', 'pointercancel'].forEach(type => viewerImage.addEventListener(type, event => {
+      pointers.delete(event.pointerId);
+      if (pointers.size < 2) pinchDistance = 0;
+      if (!pointers.size) { dragStart = null; viewerImage.classList.remove('is-dragging'); }
+    }));
+    function distance(points) { return Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y); }
+  })();
+</script>
 
 </body>
 </html>
